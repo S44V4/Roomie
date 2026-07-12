@@ -1,0 +1,74 @@
+Build a full-stack web app called "Roomie" — a clean, minimal chore rotation and 
+expense-splitting tracker for shared households (roommates, PGs, hostels, flatshares). 
+This is a standalone product for any group to sign up and use, not hardcoded to one house.
+
+STACK
+- React frontend, Node/Express backend, Postgres (Replit's built-in Postgres)
+- Hand-rolled auth: email + password, sessions, bcrypt password hashing
+- Deploy-ready on Replit's hosting
+
+DESIGN
+- Clean, minimal UI — lots of whitespace, simple typography, no clutter. Prioritize 
+  legibility and calm visual hierarchy over dense dashboards. Mobile-responsive, since 
+  most members will check this on their phone.
+
+CORE CONCEPT: HOUSEHOLDS
+- A household is a group of people sharing chores/expenses
+- One person creates a household and becomes its admin; admin gets an invite link/code 
+  to share with roommates so they can join
+- A household can have exactly one admin (for v1) and any number of members
+- Users can belong to only one household at a time (v1 simplicity)
+
+DATA MODEL (adjust as needed, but keep roughly this shape)
+- users: id, name, email, password_hash
+- households: id, name, invite_code, admin_user_id
+- household_members: household_id, user_id, joined_at
+- chores: id, household_id, name, description, frequency (daily/weekly/custom), rotation_order (ordered list of user ids)
+- chore_assignments: id, chore_id, user_id, date, status (pending/done), confirmed_at
+- expenses: id, household_id, paid_by (user id), amount, description, date
+- expense_splits: id, expense_id, user_id, share_amount
+
+FEATURE 1: ADMIN SETS THE ROUTINE
+- Only the admin can create/edit chores and set the rotation order for each
+- Admin picks frequency (daily, weekly, or specific days) and the order members rotate through
+- Backend auto-generates assignments going forward based on rotation order and frequency
+
+FEATURE 2: MEMBER VIEW — TODAY'S CHORE + CONFIRM
+- Each member, on login/home screen, sees a simple card: "Your chore today: [chore name]" 
+  (or "Nothing assigned today")
+- One button: "Mark as done" — confirms it, timestamps it, updates status
+- Keep this view extremely simple — this is the daily-use screen, so it should load fast 
+  and require zero thought
+
+FEATURE 3: SHARED DASHBOARD (VISIBLE TO ALL MEMBERS)
+- A household-wide dashboard everyone can see, showing:
+  - Today's assignments for every chore (who's on what, done/pending status)
+  - An upcoming schedule view — next 7-14 days of chore assignments per rotation, so 
+    everyone can see what's coming and plan around it
+  - Simple history (who did what, when) further down or on a separate tab
+- This is read-only for regular members; only admin can edit the underlying chores/rotation
+
+FEATURE 4: EXPENSE SPLITTING
+- Any member can log an expense: amount, description, who paid, who it's split among 
+  (default: split evenly among all household members, allow selecting a subset)
+- Maintain running balances per member within the household
+- Implement debt simplification: net each person's balance, then compute the minimum set 
+  of transactions to settle all debts (greedy debtor-creditor matching)
+- "Settle Up" screen showing exactly who should pay whom and how much
+
+ROLES SUMMARY
+- Admin: creates household, sets/edits chores and rotations, full visibility
+- Member: joins via invite code, sees today's chore + confirm button, sees shared 
+  dashboard (schedule + history), can log expenses, cannot edit chore setup
+
+NOT NEEDED FOR V1 (skip unless I ask)
+- Push notifications / WhatsApp / Telegram integration
+- Real payment processing — this only tracks who owes whom
+- Multiple households per user
+- Native mobile app — responsive web is enough
+
+DELIVERABLE
+Start by scaffolding the project structure and DB schema, then build auth + household 
+creation/joining, then admin chore setup, then the member daily view, then the shared 
+dashboard, then expenses + settle up. Show me the schema and folder structure before 
+writing feature code so I can sanity-check it first.

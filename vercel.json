@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/roomie run build",
+  "outputDirectory": "artifacts/roomie/dist/public",
+  "installCommand": "pnpm install",
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.mjs"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
